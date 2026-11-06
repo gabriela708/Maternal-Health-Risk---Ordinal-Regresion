@@ -1,0 +1,30 @@
+% Plantilla del curso: reemplazar el preámbulo por el .tex oficial descargado del enlace del enunciado
+% y conservar los \input de las secciones.
+\documentclass[10pt,twocolumn]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{amsmath,amssymb,graphicx,booktabs,algorithm,algpseudocode,natbib,hyperref}
+\usepackage[margin=2cm]{geometry}
+\graphicspath{{../results/figures/}}
+
+\title{Clasificación ordinal bayesiana del nivel de riesgo materno a partir de variables fisiológicas}
+\author{Sara Gabriela Chisaba Cárdenas, Alejandra Cortes Murillo, Juan Esteban Silva Arévalo\\
+Pregrado Ciencia de Datos, Universidad Externado de Colombia}
+\date{Entrega: xx de noviembre de 2026}
+
+\begin{document}
+\maketitle
+\input{secciones/00_resumen}        % A
+\input{secciones/01_introduccion}   % A
+\input{secciones/02_estado_arte}    % A
+\input{secciones/03_eda}            % A
+\input{secciones/04_inferencia}     % B
+\input{secciones/05_modelacion}     % C
+\input{secciones/06_resultados}     % C
+\input{secciones/07_conclusiones}   % Todos
+\bibliographystyle{apalike}
+\bibliography{Bibliografia}
+\onecolumn
+\appendix
+\input{secciones/08_apendice}       % B
+\end{document}
