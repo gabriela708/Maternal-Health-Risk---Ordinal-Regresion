@@ -10,12 +10,12 @@ Esta guía dice **qué** hacer y **en qué orden**. El **cómo** lo deciden y lo
 
 ## Paso 0 — Todos (primer día)
 
-1. [ ] Leer completa la sección 3.4 y la sección 4 (calificación) de `docs/Enunciado_Proyecto.pdf`.
-2. [ ] Leer `docs/correcciones.md` y repartir cualquier punto que no esté asignado.
-3. [ ] Conectar el repositorio siguiendo el `README.md`.
+1. [x] Leer completa la sección 3.4 y la sección 4 (calificación) de `docs/Enunciado_Proyecto.pdf`.
+2. [x] Leer `docs/correcciones.md` y repartir cualquier punto que no esté asignado.
+3. [x] Conectar el repositorio siguiendo el `README.md`.
 4. [ ] Acordar en grupo y completar `src/config.py`: semilla, nombres de variables y codificación ordinal de RiskLevel.
 5. [ ] Descargar la plantilla LaTeX oficial del enlace del enunciado y pasar su preámbulo a `informe/main.tex`.
-6. [ ] Fijar fechas internas para cada hito (ver cronograma al final).
+6. [x] Fijar fechas internas para cada hito (ver cronograma al final).
 
 ---
 
@@ -24,14 +24,14 @@ Esta guía dice **qué** hacer y **en qué orden**. El **cómo** lo deciden y lo
 **Archivos:** `src/01_eda.py`, `informe/secciones/00_resumen.tex`, `01_introduccion.tex`, `02_estado_arte.tex`, `03_eda.tex`
 
 ### Parte 1 — Pensamiento crítico (correcciones de la segunda entrega)
-1. [ ] Releer el comentario de la profesora en la segunda entrega y la lista de `docs/correcciones.md`.
-2. [ ] Escribir qué se entiende por **riesgo gestacional** y cómo se clasifica en niveles, apoyándose en una guía clínica.
-3. [ ] Para **cada variable** de la base, explicar con fuentes su relación clínica con el riesgo.
-4. [ ] Reunir los artículos clave y extraer de cada uno: objetivo, datos, método, hallazgos y limitaciones.
-5. [ ] Reescribir el **estado del arte** integrando esos hallazgos en tres bloques: qué se sabe, qué se discute y qué falta investigar. No listar los artículos uno por uno.
+1. [x] Releer el comentario de la profesora en la segunda entrega y la lista de `docs/correcciones.md`.
+2. [x] Escribir qué se entiende por **riesgo gestacional** y cómo se clasifica en niveles, apoyándose en una guía clínica.
+3. [x] Para **cada variable** de la base, explicar con fuentes su relación clínica con el riesgo.
+4. [x] Reunir los artículos clave y extraer de cada uno: objetivo, datos, método, hallazgos y limitaciones.
+5. [x] Reescribir el **estado del arte** integrando esos hallazgos en tres bloques: qué se sabe, qué se discute y qué falta investigar. No listar los artículos uno por uno.
 6. [ ] Revisar los puntos de consistencia de `docs/correcciones.md` en lo que toca a referencias.
 7. [ ] Pasar todas las referencias a `informe/Bibliografia.bib`.
-8. [ ] Releer todo el texto en voz alta: quitar repeticiones y reescribir con palabras propias.
+8. [x] Releer todo el texto en voz alta: quitar repeticiones y reescribir con palabras propias.
 
 ### Parte 2 — EDA (`src/01_eda.py`)
 9. [ ] Completar los TODO del script.
@@ -56,13 +56,13 @@ Esta guía dice **qué** hacer y **en qué orden**. El **cómo** lo deciden y lo
 **Archivos:** funciones de la sección "PERSONA B" en `src/03_modelo_bayesiano.py`, `informe/secciones/04_inferencia.tex`, `08_apendice.tex`
 
 ### Parte 1 — Correcciones de bayesiana
-1. [ ] Releer la primera entrega de bayesiana y las correcciones de `docs/correcciones.md`.
-2. [ ] Escribir por qué la variable objetivo pide un modelo **ordinal** y qué supuestos trae ese modelo.
-3. [ ] Escribir la **likelihood** del modelo con notación formal.
-4. [ ] Revisar cada prior de la entrega anterior y decidir cuáles se quedan, cuáles se eliminan y por qué (¿la variable existe en la base?, ¿el parámetro existe en el modelo ordinal?).
-5. [ ] Para cada prior que quede: distribución, hiperparámetros y argumento con fuente.
-6. [ ] Revisar los odds ratios citados: ¿a qué tipo de variable y a qué escala se refieren?, ¿cómo se trasladan a la escala de los coeficientes del modelo?
-7. [ ] Acordar con la Persona C la escala de las variables (depende del preprocesamiento).
+1. [x] Releer la primera entrega de bayesiana y las correcciones de `docs/correcciones.md`.
+2. [x] Escribir por qué la variable objetivo pide un modelo **ordinal** y qué supuestos trae ese modelo.
+3. [x] Escribir la **likelihood** del modelo con notación formal.
+4. [x] Revisar cada prior de la entrega anterior y decidir cuáles se quedan, cuáles se eliminan y por qué (¿la variable existe en la base?, ¿el parámetro existe en el modelo ordinal?).
+5. [x] Para cada prior que quede: distribución, hiperparámetros y argumento con fuente.
+6. [x] Revisar los odds ratios citados: ¿a qué tipo de variable y a qué escala se refieren?, ¿cómo se trasladan a la escala de los coeficientes del modelo?
+7. [x] Acordar con la Persona C la escala de las variables (depende del preprocesamiento).
 
 ### Parte 2 — Código (sección "PERSONA B")
 8. [ ] Implementar `log_likelihood`, `log_prior` y `log_posterior`.
@@ -133,7 +133,7 @@ Esta guía dice **qué** hacer y **en qué orden**. El **cómo** lo deciden y lo
 
 ## Cronograma sugerido
 
-| Semana | Persona A | Persona B | Persona C |
+| Días | Persona A | Persona B | Persona C |
 |---|---|---|---|
 | 1 | Pasos 1–5 y EDA (9–11) | Pasos 1–7 | Preprocesamiento (1–4) |
 | 2 | Pasos 6–8 y 12–13 | Código (8–11) | Algoritmo y MCMC (5–10) |
