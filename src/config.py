@@ -10,12 +10,11 @@ DATA_PROCESSED = ROOT / "data" / "processed"
 FIGURES = ROOT / "results" / "figures"
 TABLES = ROOT / "results" / "tables"
 
-# TODO (grupo): definir una semilla común para que los resultados sean reproducibles.
-SEED = None
+SEED = 42
 
-# TODO (grupo): listar los nombres de las variables predictoras y la variable objetivo.
-PREDICTORS = []
-TARGET = None
+PREDICTORS = ["Age", "SystolicBP", "DiastolicBP", "BS", "BodyTemp", "HeartRate"]
+TARGET = "RiskLevel"
 
-# TODO (grupo): definir la codificación ordinal de RiskLevel (qué número va con cada nivel).
-LEVELS = {}
+LEVELS = {"low risk": 0, "mid risk": 1, "high risk": 2}
+L_NOMBRES = ["Bajo","Medio","Alto"]
+ORDEN = ["low risk","mid risk","high risk"]
