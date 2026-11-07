@@ -1,3 +1,89 @@
 % Responsable: B
 \section{Apéndice matemático}
-% TODO
+\subsection{Likelihood ordinal}
+Por definición de la función logística acumulada,
+\[
+F_{ik}=\Pr(Y_i\leq k\mid\mathbf{z}_i)
+=\frac{1}{1+\exp[-(\alpha_k-\mathbf{z}_i^\top
+\boldsymbol{\beta})]},\qquad k\in\{1,2\}.
+\]
+Al restar probabilidades acumuladas se obtienen las probabilidades de cada
+categoría:
+\[
+p_{i0}=F_{i1},\qquad p_{i1}=F_{i2}-F_{i1},\qquad p_{i2}=1-F_{i2}.
+\]
+Para una observación categórica, su contribución a la likelihood es
+$\prod_{k=0}^{2}p_{ik}^{\mathbb{I}(y_i=k)}$. La independencia condicional de
+las observaciones da
+\[
+L(\boldsymbol{\theta}\mid D_{\mathrm{train}})
+=\prod_{i=1}^{n_{\mathrm{train}}}
+\prod_{k=0}^{2}p_{ik}^{\mathbb{I}(y_i=k)},
+\qquad
+\log L=\sum_{i=1}^{n_{\mathrm{train}}}\log p_{i,y_i}.
+\]
+
+\subsection{Transformación de coeficientes}
+La estandarización aplicada a cada predictor es
+$z_{ij}=(x_{ij}-\bar{x}_{j,\mathrm{train}})/s_{j,\mathrm{train}}$.
+Al transformar el coeficiente asociado,
+\[
+\beta_j=s_{j,\mathrm{train}}\beta_j^{\mathrm{raw}}.
+\]
+Si en unidades originales
+$\beta_j^{\mathrm{raw}}\sim\mathcal{N}(\mu_j,\sigma_j^2)$, entonces, por la
+transformación lineal de una Normal,
+\[
+\mathbb{E}[\beta_j]
+=s_{j,\mathrm{train}}\mu_j,\qquad
+\operatorname{Var}(\beta_j)
+=s_{j,\mathrm{train}}^2\sigma_j^2.
+\]
+La multiplicación por una desviación positiva conserva el signo del
+coeficiente, por lo que las priors truncadas positivas permanecen truncadas en
+$(0,\infty)$. Las desviaciones de estandarización se estiman solo con train; y en particular,
+las priors originales de Age, SystolicBP y DiastolicBP usan
+desviación estándar $0.02$; el valor $0.02$ no representa una varianza. Para
+BS y HeartRate se especifican directamente priors en la escala estandarizada:
+\[
+\beta_{\mathrm{BS}}\sim\mathcal{N}^{+}(0,1^2),\qquad
+\beta_{\mathrm{HeartRate}}\sim\mathcal{N}(0,1^2).
+\]
+La primera restringe de manera no negativa sin trasladar el OR continuo no
+verificado; la segunda permite efectos de ambos signos al no contar con una
+dirección suficientemente sustentada. En ambas, el segundo parámetro escrito
+es la desviación estándar.
+
+\subsection{Centros de las priors de los puntos de corte}
+Sean $n_0,n_1,n_2$ las frecuencias de las tres clases en entrenamiento y
+$n=n_0+n_1+n_2$. Las probabilidades acumuladas empíricas son
+$q_1=n_0/n$ y $q_2=(n_0+n_1)/n$. Aplicar la transformación logit a estas
+proporciones produce los centros empíricos
+\[
+m_1=\log\frac{q_1}{1-q_1},\qquad
+m_2=\log\frac{q_2}{1-q_2}.
+\]
+Estos centros son una calibración inicial basada en las proporciones marginales
+de train; no son estimaciones directas de las probabilidades condicionales a
+$\mathbf{z}_i=\mathbf{0}$. Se tratan como hiperparámetros fijos durante el
+muestreo; por tanto, el procedimiento es empirical Bayes y no incorpora la
+incertidumbre de esa estimación.
+
+\subsection{Posterior}
+Aplicando la regla de Bayes,
+\[
+\pi(\boldsymbol{\theta}\mid D_{\mathrm{train}})
+=\frac{L(\boldsymbol{\theta}\mid D_{\mathrm{train}})
+       \pi(\boldsymbol{\theta})}
+      {p(D_{\mathrm{train}})}
+\propto
+L(\boldsymbol{\theta}\mid D_{\mathrm{train}})
+\pi(\boldsymbol{\theta}).
+\]
+El denominador no depende de los parámetros y puede omitirse al calcular la
+log-posterior usada por el algoritmo MCMC:
+\[
+\log\pi(\boldsymbol{\theta}\mid D_{\mathrm{train}})
+=\log L(\boldsymbol{\theta}\mid D_{\mathrm{train}})
++\log\pi(\boldsymbol{\theta})+\text{constante}.
+\]

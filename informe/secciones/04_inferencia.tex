@@ -1,10 +1,122 @@
 % Responsable: B
 \section{Metodología: inferencia bayesiana}
 \subsection{Justificación del modelo}
-% TODO
+La variable de respuesta tiene tres categorías ordenadas, de menor a mayor
+riesgo: bajo, medio y alto. En consecuencia, se define como $Y_i\in\{0,1,2\}$ y se
+usa una regresión logística ordinal acumulativa. Esta parametrización conserva
+el orden de las categorías y modela las probabilidades de no superar cada nivel,
+en vez de tratarlos como etiquetas nominales sin orden.
+
+El modelo asume la hipótesis de razones de probabilidades proporcionales,
+según la cual un único vector de coeficientes describe las transiciones en ambos puntos de corte.
+Asimismo, se presuponen observaciones condicionalmente independientes y una relación lineal entre
+los predictores estandarizados y el logit acumulado. La validez del supuesto de odds proporcionales
+será evaluada y discutida críticamente junto con los resultados del ajuste.
+
+Los predictores se estandarizan usando exclusivamente la media
+$\bar{x}_{j,\mathrm{train}}$ y la desviación estándar $s_{j,\mathrm{train}}$
+del conjunto de entrenamiento:
+\[
+z_{ij}=\frac{x_{ij}-\bar{x}_{j,\mathrm{train}}}{s_{j,\mathrm{train}}}.
+\]
+Los mismos parámetros se aplican al conjunto de prueba.
+
 \subsection{Distribución likelihood}
-% TODO
+Sean $\alpha_1<\alpha_2$ los puntos de corte y
+$\eta_i=\mathbf{z}_i^\top\boldsymbol{\beta}$ el predictor lineal. Se define
+\[
+\operatorname{logit}\{\Pr(Y_i\leq k\mid\mathbf{z}_i)\}
+=\alpha_k-\eta_i,\qquad k\in\{1,2\}.
+\]
+Si $F_{ik}=\operatorname{logit}^{-1}(\alpha_k-\eta_i)$, las probabilidades de
+las tres categorías son
+\[
+\Pr(Y_i=0)=F_{i1},\qquad
+\Pr(Y_i=1)=F_{i2}-F_{i1},\qquad
+\Pr(Y_i=2)=1-F_{i2}.
+\]
+Por tanto, para los datos de entrenamiento
+$D_{\mathrm{train}}=(\mathbf{Z}_{\mathrm{train}},\mathbf{y}_{\mathrm{train}})$,
+la likelihood categórica es
+\[
+L(\boldsymbol{\theta}\mid D_{\mathrm{train}})
+=\prod_{i=1}^{n_{\mathrm{train}}}
+\prod_{k=0}^{2}p_{ik}^{\mathbb{I}(y_i=k)},
+\]
+donde $\boldsymbol{\theta}=(\alpha_1,\alpha_2,\boldsymbol{\beta})$ y $p_{ik}$
+es la probabilidad asignada a la categoría $k$.
+
 \subsection{Especificación de las priors}
-% TODO: distribución, hiperparámetros y argumento de cada una.
+Las priors de los coeficientes de la versión anterior estaban expresadas por
+unidad original del predictor. Si
+$\beta_j^{\mathrm{raw}}\sim\mathcal{N}(\mu_j,\sigma_j^2)$ y el predictor se
+estandariza con desviación $s_{j,\mathrm{train}}$, el coeficiente en la escala
+estandarizada es
+\[
+\beta_j=s_{j,\mathrm{train}}\beta_j^{\mathrm{raw}}
+\quad\Longrightarrow\quad
+\beta_j\sim
+\mathcal{N}\!\left(s_{j,\mathrm{train}}\mu_j,
+                  (s_{j,\mathrm{train}}\sigma_j)^2\right).
+\]
+La transformación conserva el soporte positivo de las priors truncadas. Los
+hiperparámetros implementados, en el orden de los predictores, son:
+\[
+\begin{aligned}
+\beta_{\mathrm{Age}} &\sim
+ \mathcal{N}(0.03s_{\mathrm{Age}},(0.02s_{\mathrm{Age}})^2),\\
+\beta_{\mathrm{SystolicBP}} &\sim
+ \mathcal{N}^{+}(0.04s_{\mathrm{Sys}},(0.02s_{\mathrm{Sys}})^2),\\
+\beta_{\mathrm{DiastolicBP}} &\sim
+ \mathcal{N}^{+}(0.03s_{\mathrm{Dia}},(0.02s_{\mathrm{Dia}})^2),\\
+\beta_{\mathrm{BS}} &\sim
+ \mathcal{N}^{+}(0,1^2),\\
+\beta_{\mathrm{BodyTemp}} &\sim
+ \mathcal{N}(0,(0.50s_{\mathrm{Temp}})^2),\\
+\beta_{\mathrm{HeartRate}} &\sim
+ \mathcal{N}(0,1^2).
+\end{aligned}
+\]
+Aquí $\mathcal{N}^{+}$ denota una distribución Normal restringida a valores positivos y cada
+$s_j$ es la desviación estándar calculada sobre el conjunto de entrenamiento durante el preprocesamiento.
+Para las variables de edad y presión arterial, las desviaciones estándar originales de las
+priors son $0.02$ (no a sus varianzas); al expresarse unidades estandarizadas se multiplican
+por $s_j$. Por otro lado,la prior de glucemia se especifica débilmente informativa como
+$\mathcal{N}^{+}(0,1^2)$ estandarizada (desviación estándar $1$), esta elección refleja el
+signo no negativo esperado, omitiendo el OR $1.35$ por mmol/L de la versión anterior, ya que no se ha
+verificado como efecto de `BS` continua. La prior de frecuencia cardíaca es
+$\mathcal{N}(0,1^2)$ estandarizada (desviación estándar $1$); esta se centra en cero porque no se cuenta con una
+dirección de efecto suficientemente sustentada, y regulariza magnitudes grandes.
+Cabe destacar que ambas escalas corresponden a decisiones de modelado débilmente informativas
+y no a parámetros clínicos de la literatura.
+Finalmente ,los centros de las priors de los puntos de corte se calculan con las
+proporciones acumuladas de las etiquetas de entrenamiento:
+\[
+m_1=\operatorname{logit}\!\left(\frac{n_0}{n_{\mathrm{train}}}\right),
+\qquad
+m_2=\operatorname{logit}\!\left(
+\frac{n_0+n_1}{n_{\mathrm{train}}}\right).
+\]
+Se usa una desviación estándar de $0.5$ y se impone el orden
+$\alpha_1<\alpha_2$:
+\[
+\pi(\alpha_1,\alpha_2)\propto
+\phi(\alpha_1;m_1,0.5^2)\,
+\phi(\alpha_2;m_2,0.5^2)\,
+\mathbb{I}(\alpha_1<\alpha_2).
+\]
+Esta elección corresponde a un enfoque de Bayes empírico, dado que estima hiperparámetros con las
+etiquetas del grupo de entrenamiento, que también intervienen en la likelihood, además no usa
+etiquetas de prueba; esta reutilización y su efecto deben reconocerse y
+examinarse en el análisis de sensibilidad.
+
 \subsection{Distribución posterior}
-% TODO
+La posterior, hasta una constante de normalización, es
+\[
+\pi(\boldsymbol{\theta}\mid D_{\mathrm{train}})
+\propto
+L(\boldsymbol{\theta}\mid D_{\mathrm{train}})
+\pi(\boldsymbol{\theta}).
+\]
+La evaluación en la partición de prueba se realiza después del ajuste y no
+participa en la likelihood ni en la determinación de los hiperparámetros.
