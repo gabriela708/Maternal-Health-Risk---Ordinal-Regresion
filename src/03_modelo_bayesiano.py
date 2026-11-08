@@ -9,10 +9,11 @@ Salidas:  cadenas guardadas en data/processed/ y tabla resumen en results/tables
 Uso: python src/03_modelo_bayesiano.py
 """
 import numpy as np
+import pandas as pd
 from scipy.special import log_expit
 from scipy.stats import norm
 
-from config import DATA_PROCESSED, PREDICTORS, TABLES
+from config import DATA_PROCESSED, PREDICTORS, SEED, TABLES
 
 
 # Priors definidas en unidades originales: media y desviación estándar.
@@ -194,14 +195,102 @@ def log_posterior(
     return prior + log_likelihood(theta, X, y)
 
 
-# ---------------------------------------------------------------- PERSONA C
-def metropolis_hastings(theta0, n_iter, X, y):
-    """TODO C1: implementar el algoritmo y devolver la cadena y la tasa de aceptación."""
-    raise NotImplementedError
+
+
+def metropolis_hastings(theta0, n_iter, X, y, predictor_scales,
+                        cutpoint_prior_means, proposal_sd=0.10):
+    """Metropolis-Hastings con propuesta normal simétrica (random walk).
+
+    Devuelve la cadena (n_iter, n_parametros) y la tasa de aceptación.
+    """
+    theta0 = np.asarray(theta0, dtype=float)
+    chain = np.zeros((n_iter, len(theta0)))
+    chain[0] = theta0
+    accepted = 0
+
+    current_log_post = log_posterior(theta0, X, y, predictor_scales, cutpoint_prior_means)
+
+    for i in range(1, n_iter):
+        # 1. Proponer un candidato sumando una perturbación normal
+        proposal = np.random.normal(loc=chain[i - 1], scale=proposal_sd)
+
+        # 2. Log-posterior del candidato
+        proposal_log_post = log_posterior(proposal, X, y, predictor_scales, cutpoint_prior_means)
+
+        # 3. Razón de aceptación en escala log (la propuesta simétrica se cancela)
+        log_alpha = proposal_log_post - current_log_post
+
+        # 4. Aceptar o rechazar
+        if np.log(np.random.uniform()) < log_alpha:
+            chain[i] = proposal
+            current_log_post = proposal_log_post
+            accepted += 1
+        else:
+            chain[i] = chain[i - 1]
+
+    return chain, accepted / (n_iter - 1)
+
+
+# Hiperparámetros del MCMC
+N_ITER = 20000
+BURN_IN = 5000
+N_CHAINS = 4
+PARAM_NAMES = ["alpha_1", "alpha_2"] + list(PREDICTORS)
+
+
+def ejecutar_pipeline_mcmc(nombre_dataset, proposal_sd):
+    """Corre el MCMC para train.csv o train_full.csv y guarda cadenas y resumen."""
+    print(f"\n{'=' * 40}\nEjecutando MCMC para: {nombre_dataset} (proposal_sd = {proposal_sd})\n{'=' * 40}")
+
+    # 1. Datos de entrenamiento
+    train_df = pd.read_csv(DATA_PROCESSED / f"{nombre_dataset}.csv")
+    y_train = train_df["RiskLevel_cd"].values
+    X_train = train_df[PREDICTORS].values
+
+    # 2. Desviaciones de train para transformar las priors
+    scales_df = pd.read_csv(DATA_PROCESSED / f"parametros_escalado_{nombre_dataset}.csv")
+    predictor_scales = scales_df["DesviacionEstandar"].values
+
+    # 3. Centros de los cutpoints (Bayes empírico, solo con y_train)
+    cutpoint_prior_means = cutpoint_prior_from_training_labels(y_train)
+
+    # 4. Varias cadenas con puntos iniciales distintos
+    cadenas = []
+    for c in range(N_CHAINS):
+        alpha_init = cutpoint_prior_means + np.random.normal(0, 0.1, size=2)
+        beta_init = 0.05 + np.random.normal(0, 0.01, size=len(PREDICTORS))
+        theta0 = np.concatenate([alpha_init, beta_init])
+
+        chain, acc_rate = metropolis_hastings(
+            theta0, N_ITER, X_train, y_train,
+            predictor_scales, cutpoint_prior_means, proposal_sd,
+        )
+        cadenas.append(chain)
+        print(f"   Cadena {c + 1}: tasa de aceptación {acc_rate * 100:.2f}%")
+
+    cadenas = np.array(cadenas)  # forma (n_chains, n_iter, n_params)
+    np.save(DATA_PROCESSED / f"cadenas_{nombre_dataset}.npy", cadenas)
+
+    # 5. Resumen de la posterior (sin burn-in, cadenas unidas)
+    muestras = cadenas[:, BURN_IN:, :].reshape(-1, cadenas.shape[-1])
+    resumen = pd.DataFrame({
+        "Parametro": PARAM_NAMES,
+        "Media": muestras.mean(axis=0),
+        "Desv_Std": muestras.std(axis=0),
+        "IC_2.5%": np.percentile(muestras, 2.5, axis=0),
+        "IC_97.5%": np.percentile(muestras, 97.5, axis=0),
+    })
+    resumen.to_csv(TABLES / f"resumen_posterior_{nombre_dataset}.csv", index=False)
+    print(resumen.round(3).to_string(index=False))
 
 
 if __name__ == "__main__":
-    # TODO C2: cargar train, correr varias cadenas, definir el burn-in
-    #          y guardar las cadenas.
-    # TODO C3: tabla resumen de la posterior (media, desviación, intervalos).
-    pass
+    np.random.seed(SEED)
+    TABLES.mkdir(parents=True, exist_ok=True)
+
+    # A. Base principal (sin duplicados)
+    ejecutar_pipeline_mcmc("train", proposal_sd=0.10)
+
+    # B. Base completa (con duplicados). Con más filas la posterior es más angosta,
+    #    por eso necesita un paso más pequeño para mantener una aceptación similar.
+    ejecutar_pipeline_mcmc("train_full", proposal_sd=0.06)
