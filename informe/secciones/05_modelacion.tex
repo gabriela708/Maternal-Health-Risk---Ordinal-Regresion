@@ -1,6 +1,66 @@
-% Responsable: C
+% 
 \section{Metodología: modelación bayesiana}
 \subsection{Algoritmo}
-% TODO: Metropolis-Hastings o Gibbs con su pseudocódigo.
+La posterior del modelo ordinal no tiene una forma cerrada conocida, ya que la
+likelihood logística no es conjugada con las priors normales y además existen
+restricciones sobre los parámetros ($\alpha_1<\alpha_2$ y coeficientes positivos
+para las presiones y la glucemia). Por lo mismo, no es posible obtener
+directamente las distribuciones condicionales completas que necesitaría un
+muestreo de Gibbs, y se decidió usar el algoritmo de Metropolis-Hastings con una
+propuesta normal simétrica (\emph{random walk}). Este algoritmo solo necesita
+evaluar la log-posterior hasta una constante, que es justamente lo que entregan
+las funciones de likelihood y priors definidas en la sección anterior.
+
+En cada iteración se propone un nuevo vector de parámetros sumando una
+perturbación normal al estado actual. Como la propuesta es simétrica, los
+términos de transición se cancelan y la razón de aceptación depende solo de la
+diferencia de log-posteriores. Las restricciones no requieren un paso adicional:
+cuando un candidato las incumple, la log-prior vale $-\infty$ y el candidato se
+rechaza automáticamente.
+
+\begin{algorithm}[h]
+\caption{Metropolis-Hastings con propuesta normal simétrica}
+\begin{algorithmic}[1]
+\Require $\boldsymbol{\theta}^{(0)}$, $N$, $\sigma_{\mathrm{prop}}$, $D_{\mathrm{train}}$
+\State $\ell \gets \log\pi(\boldsymbol{\theta}^{(0)}\mid D_{\mathrm{train}})$
+\For{$t=1,\dots,N-1$}
+  \State $\boldsymbol{\theta}^{*}\sim\mathcal{N}\!\left(\boldsymbol{\theta}^{(t-1)},\sigma_{\mathrm{prop}}^{2}\mathbf{I}\right)$
+  \State $\ell^{*}\gets\log\pi(\boldsymbol{\theta}^{*}\mid D_{\mathrm{train}})$
+  \State $u\sim\mathcal{U}(0,1)$
+  \If{$\log u<\ell^{*}-\ell$}
+    \State $\boldsymbol{\theta}^{(t)}\gets\boldsymbol{\theta}^{*}$;\quad $\ell\gets\ell^{*}$
+  \Else
+    \State $\boldsymbol{\theta}^{(t)}\gets\boldsymbol{\theta}^{(t-1)}$
+  \EndIf
+\EndFor
+\State \Return cadena $\{\boldsymbol{\theta}^{(t)}\}_{t=0}^{N-1}$ y tasa de aceptación
+\end{algorithmic}
+\end{algorithm}
+
 \subsection{Implementación del MCMC}
-% TODO
+El vector de parámetros tiene ocho componentes,
+$\boldsymbol{\theta}=(\alpha_1,\alpha_2,\beta_{\mathrm{Age}},\beta_{\mathrm{Sys}},
+\beta_{\mathrm{Dia}},\beta_{\mathrm{BS}},\beta_{\mathrm{Temp}},\beta_{\mathrm{HR}})$.
+Se corrieron 4 cadenas de 20.000 iteraciones cada una, descartando las primeras
+5.000 como periodo de calentamiento (\emph{burn-in}), de modo que quedan 60.000
+muestras de la posterior. Cada cadena parte de un punto distinto para poder
+comprobar que todas llegan a la misma distribución: los puntos de corte inician
+en los centros de sus priors más una perturbación $\mathcal{N}(0,0.1^2)$ y los
+coeficientes en $0.05$ más una perturbación $\mathcal{N}(0,0.01^2)$, valores que
+cumplen todas las restricciones. Se fijó una semilla común para que los
+resultados sean reproducibles.
+
+El tamaño del paso de la propuesta se ajustó según la tasa de aceptación. En una
+primera prueba con $\sigma_{\mathrm{prop}}=0.05$ y 10.000 iteraciones, la
+aceptación fue cercana al 55\,\%, lo que indicaba pasos demasiado pequeños: la
+cadena se movía poco y el tamaño de muestra efectivo de algunos parámetros era
+bajo. Por esto se aumentó el paso a $\sigma_{\mathrm{prop}}=0.10$ y el número de
+iteraciones a 20.000, con lo que la aceptación quedó entre 26\,\% y 27\,\% en las
+cuatro cadenas, dentro del rango recomendado para este número de parámetros.
+
+El mismo procedimiento se aplicó a la base con duplicados como análisis de
+sensibilidad, usando sus propias desviaciones de entrenamiento para las priors
+y sus propios centros para los puntos de corte. Al tener más filas, su posterior
+es más angosta y con el mismo paso la aceptación bajaba a cerca del 13\,\%, por
+lo que para esta base se usó $\sigma_{\mathrm{prop}}=0.06$, que dejó la
+aceptación entre 32\,\% y 34\,\%.
