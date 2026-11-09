@@ -1,4 +1,116 @@
 % Responsable: A
 \section{Introducción}
+\subsection{Contexto}
+
+La reducción de la mortalidad materna y fetal, junto con tratamientos oportunos
+durante el embarazo son factores prioritarios a nivel de sanidad pública global
+lo cual se alinea con los ODS, como se menciona en ONU Mujeres ``\emph{Meta 3.1
+de los ODS: Reducir la tasa mundial de mortalidad materna a menos de 70 por cada
+100\,000 nacidos vivos\ldots Un poco más del 90\,\% de todas las muertes maternas
+ocurren en países de ingresos y medios bajos en 2023}''. Por eso el principal
+problema radica en situaciones de monitorización primaria en zonas rurales o
+vulnerables de un país en desarrollo junto con la identificación temprana de los
+síntomas y/o complicaciones para descubrir el nivel de riesgo en función del
+seguimiento continuo de signos vitales como la frecuencia cardíaca, presión
+arterial sistólica, temperatura corporal, entre otras. Sin embargo, evaluaciones
+puntuales o un control inconsistente dificultan la detección a tiempo de
+condiciones médicas que afectan tanto a la madre como al bebé y la Organización
+Mundial de la Salud [OMS] (2025) indica que \emph{la mayoría de las muertes
+maternas son prevenibles, ya que existen soluciones sanitarias bien conocidas
+para prevenir o controlar las complicaciones}.
+
+No obstante, se depende demasiado del presupuesto público y gubernamental para el
+financiamiento de proyectos de tecnologías o nuevas infraestructuras en la salud
+pública (Ramos Vázquez, 2019), ``\emph{La mayoría de muertes, lesiones y
+problemas de salud se pueden evitar mejorando el acceso a servicios adecuados de
+atención de la salud, incluidos los métodos de planificación familiar eficaces y
+la atención obstétrica de emergencia, reconociendo el derecho de la mujer y del
+hombre a la información y al acceso a métodos seguros, eficaces y
+asequibles\ldots}''. Bajo esta perspectiva y considerando que las complicaciones
+no detectadas a tiempo generan hospitalizaciones obstétricas, esto representa un
+costo significativamente mayor para el sistema de salud y las familias.
+
+Asimismo, existen grandes diferencias respecto a la atención médica prenatal
+ofrecida o disponible en los distintos centros de atención rurales, alejados de
+las ciudades donde hay una brecha sea tecnológica o económica que dificulta el
+debido proceso de monitorización durante el embarazo. Además, como se mencionó
+anteriormente, según la ONU el difícil acceso a recursos, bienes y servicios del
+sistema de saneamiento básico en ciertas comunidades vulnerables puede
+incrementar la susceptibilidad a infecciones durante la gestación y en
+consecuencia enfermedades (OMS, 2025).
+
+Dicho esto y en síntesis de lo anterior, el cumplimiento estricto de las
+regulaciones sobre privacidad y confidencialidad de la información médica de los
+pacientes es fundamental al igual que las exigencias reglamentarias para la
+validación y certificación de modelos de Inteligencia Artificial y/o Estadística
+aplicados a la salud humana (Proyecto de Ley 216, 2026), dado a los tipos de
+datos a tratar, en este caso, son datos recopilados de diferentes hospitales,
+centros médicos de salud materna y clínicas comunitarias de las zonas rurales de
+Bangladesh mediante un sistema de monitoreo de riesgos basado en IoT, con 1014
+registros de pacientes con variaciones simultáneas en distintos indicadores
+fisiológicos, lo que requiere procesos de identificación de factores de riesgo
+para la adecuada intervención médica.
+
+\subsection{Planteamiento del problema}
+
+No se ha profundizado lo suficiente en la evaluación de la suficiencia de los
+datos clínicos de rutina para la detección oportuna de riesgos durante el
+embarazo en entornos con recursos limitados. Aunque la literatura indica que la
+información clínica de los controles prenatales posee un valor predictivo mayor
+respecto a los datos demográficos, la necesidad de determinar qué tan viable y
+preciso resulta implementar estos modelos predictivos cuando se trabaja bajo la
+restricción de muestras pequeñas y la escasez de personal u equipo médico aún se
+evidencia.
+
+\subsection{Pregunta de investigación}
+
+¿En qué medida las variables fisiológicas registradas (presión arterial,
+glucosa, temperatura corporal, frecuencia cardíaca y edad) permiten clasificar
+con precisión el nivel de riesgo (RiskLevel) de una gestante, y cuáles de estos
+factores tienen mayor peso predictivo?
+
+\subsection{Justificación}
+
+El proyecto nos ofrecerá un sistema predictivo de triaje prenatal adaptado a
+entornos de atención primaria en comunidades rurales de escasos recursos. Con
+una de las bases, las sugerencias de optimización de hiperparámetros y selección
+de modelos (Nogholi et al., 2026), se espera construir un modelo
+computacionalmente eficaz y de alto rendimiento que priorice la sensibilidad o
+\emph{recall}, garantizando la detección oportuna de gestantes en estado crítico
+antes del parto. Este resultado permitirá aclarar la toma de decisiones clínicas
+y optimizar la asignación de recursos públicos en zonas rurales, orientando el
+transporte médico como ambulancias y la remisión a centros hospitalarios
+únicamente a los casos que representan un verdadero alto riesgo y no una falsa
+alarma (Nogholi et al., 2026).
+
+Por otro lado, los principales riesgos del proyecto serían el sobreajuste o la
+pérdida de precisión al transferir el modelo a otras regiones desatendidas y/o
+contextos (Nogholi et al., 2026), la presencia de ruido o fallas en la captura
+de características fisiológicas de las madres gestantes mediante sensores IoT, y
+al ser modelos opacos (dan el resultado pero no una explicación médica al
+respecto), se genera una falta de interpretación clínica y desconfianza del
+personal médico. Al no integrar mecanismos de Inteligencia Artificial Explicable
+(XAI), existe el peligro de que la herramienta sea ignorada en la práctica real
+o rechazada (Nogholi et al., 2026).
+
+\subsection{Objetivo general}
+
+Desarrollar un modelo de clasificación que, a partir de las variables
+fisiológicas registradas (presión arterial sistólica y diastólica, glucosa,
+temperatura corporal, frecuencia cardíaca y edad), permita establecer con
+precisión el nivel de riesgo (RiskLevel) de una gestante, identificando los
+factores con mayor peso predictivo para facilitar la intervención médica
+oportuna.
+
+\subsection{Objetivos específicos}
+
+\begin{enumerate}
+  \item Describir el comportamiento y distribución de las variables fisiológicas
+        según el nivel de riesgo.
+  \item Identificar los factores fisiológicos más asociados con un riesgo alto.
+  \item Construir y comparar modelos que permitan clasificar el nivel de riesgo
+        con mayor precisión.
+\end{enumerate}
+
 % TODO: contexto, planteamiento del problema, pregunta de investigación,
 % justificación, objetivo general y específicos, estructura del documento.
