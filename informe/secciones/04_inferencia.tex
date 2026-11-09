@@ -110,6 +110,24 @@ etiquetas del grupo de entrenamiento, que también intervienen en la likelihood,
 etiquetas de prueba; esta reutilización y su efecto deben reconocerse y
 examinarse en el análisis de sensibilidad.
 
+Con la partición de entrenamiento sin duplicados ($n=334$; 169, 81 y 84
+registros de riesgo bajo, medio y alto) los centros resultan $m_1=0.02$ y
+$m_2=1.09$, y las desviaciones $s_{j,\mathrm{train}}$ dan los
+hiperparámetros de la Figura~\ref{fig:priors}. Las priors de edad y presión
+arterial concentran el efecto entre valores pequeños y moderados por
+desviación estándar; las de glucemia, temperatura y frecuencia cardíaca son
+más amplias y dejan que los datos determinen la magnitud.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{priors_definitivas_train.png}
+\caption{Distribuciones a priori de los umbrales y coeficientes en escala
+estandarizada, con los hiperparámetros calculados sobre el conjunto de
+entrenamiento sin duplicados. La línea discontinua marca la media y el área
+sombreada el intervalo central del 95\,\%.}
+\label{fig:priors}
+\end{figure}
+
 \subsection{Distribución posterior}
 La posterior, hasta una constante de normalización, es
 \[
