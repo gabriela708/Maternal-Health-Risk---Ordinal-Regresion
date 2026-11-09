@@ -27,9 +27,9 @@ df.info()
 
 #%%
 descriptivas = df.describe().round(2)
-descriptivas.to_csv(TABLES/ "estadísticas_decsriptivas.csv")
+descriptivas.to_csv(TABLES / "eda_descriptivas_con_duplicados.csv")
 descriptivas_agrupadas = df.groupby(TARGET)[PREDICTORS].median().round(2)
-descriptivas_agrupadas.to_csv(TABLES / "eda_medianas_por_clase.csv")
+descriptivas_agrupadas.to_csv(TABLES / "eda_medianas_por_clase_con_duplicados.csv")
 print(descriptivas)
 print(descriptivas_agrupadas)
 
@@ -104,7 +104,7 @@ for ax, tipo in zip(axes, ['n', '%']):
 axes[0].legend(frameon=False)
 fig.suptitle('Distribución de RiskLevel con y sin registros duplicados', fontweight='bold')
 plt.tight_layout()
-plt.savefig(FIGURES/'target_duplicados.png', dpi=300, bbox_inches='tight')
+plt.savefig(FIGURES / 'eda_clases_duplicados.png', dpi=300, bbox_inches='tight')
 plt.show()
 
 
@@ -117,7 +117,7 @@ for ax, var in zip(axes.ravel(), PREDICTORS):
     ax.set_title(var)
 fig.suptitle("Distribución de las variables fisiológicas (N = %d)" % len(df))
 fig.tight_layout()
-fig.savefig(FIGURES / "eda_histogramas.png", dpi=150)
+fig.savefig(FIGURES / "eda_histogramas_con_duplicados.png", dpi=150)
 
 #%%
 
@@ -136,6 +136,7 @@ for ax, var in zip(axes.flat, PREDICTORS):
 
 fig.suptitle('Variables fisiológicas según nivel de riesgo (registros únicos)')
 plt.tight_layout()
+fig.savefig(FIGURES / "eda_boxplots_por_riesgo_sin_duplicados.png", dpi=150)
 plt.show()
 
 #   Usando el dataset de 452 registros únicos, dSE observa como en caso todas las variables se solapan las clases.
@@ -152,7 +153,7 @@ for ax, metodo in zip(axes, ["pearson", "spearman"]):
     sns.heatmap(c, annot=True, fmt=".2f", cmap="coolwarm", vmin=-1, vmax=1, ax=ax)
     ax.set_title(f"Correlación de {metodo.capitalize()} (y = riesgo ordinal)")
 fig.tight_layout()
-fig.savefig(FIGURES / "eda_correlaciones.png", dpi=150)
+fig.savefig(FIGURES / "eda_correlaciones_con_duplicados.png", dpi=150)
 
 #   La variable con menos correlaciones en el dataset es la de temperatura corporal, esto se debe a que tienenmuy pocos valores únicos y de hecho su distribución es muy estrecha.
 #   Por otro lado, como es de esperarse por su naturaleza médica, lo relacionado a la presión arterial tiene bastante correlación.
