@@ -49,7 +49,7 @@ print(descriptivas_agrupadas)
 #%% 
 print(df.isnull().sum())
 print(df.duplicated().sum())
-HeartRate_menor_7 = int((df.HeartRate < 7).sum())
+HeartRate_menor_7 = int((df.HeartRate <= 7).sum())
 Age_menor_13 = int((df.Age < 13).sum())
 Age_mayor_60 = int((df.Age > 50).sum())
 print("Valores poco probables")

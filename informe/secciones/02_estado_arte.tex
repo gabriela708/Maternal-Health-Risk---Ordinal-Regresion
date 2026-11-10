@@ -1,3 +1,57 @@
-% Responsable: A
 \section{Estado del arte}
-% TODO: qué se sabe, qué se discute y qué falta investigar.
+
+\subsection{Riesgo gestacional y variables fisiológicas}
+Un embarazo se considera de bajo riesgo cuando no hay antecedentes ni evidencia
+de complicaciones; de riesgo intermedio cuando presenta complicaciones menores
+manejables en el primer nivel de atención, y de alto riesgo cuando existe certeza
+o probabilidad de condiciones patológicas que requieren atención de segundo
+nivel (Hernández Leyva et al., 2003). Las variables de la base se relacionan con
+este riesgo por mecanismos conocidos: la presión arterial superior a 140/90 mm Hg
+indica trastornos hipertensivos y es el componente central de la preeclampsia
+(Saudan et al., 1998); una glucemia en ayuno mayor de 7,0 mmol/L o casual mayor de
+11,1 mmol/L hace sospechar diabetes gestacional o preexistente; la temperatura
+por encima de 100,4\,°F señala fiebre asociada a infecciones, y la edad menor de 20
+o mayor de 34 años es un factor de riesgo intermedio (Hernández Leyva et al.,
+2003). La frecuencia cardíaca no aparece como factor de riesgo en la guía, por lo
+que su aporte se evalúa de forma exploratoria.
+
+\subsection{Qué se sabe}
+La mortalidad materna sigue concentrada en países de ingresos bajos y medios, que
+reúnen más del 90\,\% de las muertes, aunque la mayoría son prevenibles con
+detección y seguimiento oportunos (OMS, 2025; ONU Mujeres, s.f.). El seguimiento
+prenatal funciona: en un metaanálisis de 18 estudios en países de ingresos bajos y
+medios ($N = 94.118$ nacidos vivos), asistir a controles prenatales redujo la
+mortalidad neonatal en 34\,\% a nivel global y hasta en 41\,\% en las regiones más
+vulnerables (Wondemagegn et al., 2018). En cuanto a la predicción, la evidencia
+indica que las variables clínicas del embarazo clasifican mejor el riesgo que las
+demográficas; con ellas, un clasificador KNN alcanzó 88\,\% de exactitud y 87\,\% de
+sensibilidad (Nogholi et al., 2026).
+
+\subsection{Qué se discute}
+La literatura no está de acuerdo en qué tan confiables son estos resultados, y la
+discusión se concentra en cuatro puntos. Primero, el tamaño y el origen de las
+muestras: el estudio de Nogholi et al. (2026) usa solo 62 pacientes de un hospital
+urbano de Irán, lo que genera intervalos amplios y limita su aplicación a zonas
+rurales. Segundo, la métrica con que se evalúan los modelos: ese mismo trabajo
+optimiza con exactitud, que sobreestima el desempeño cuando las clases están
+desbalanceadas, pero selecciona el modelo final por sensibilidad. Tercero, la
+interpretabilidad: los modelos que entregan una clase sin explicar de dónde sale
+generan desconfianza en el personal de salud. Cuarto, la definición de la
+etiqueta de riesgo: Mojumdar et al. (2025) describen datos de gestantes rurales de
+Bangladesh sin documentar quién asignó el nivel de riesgo ni con qué criterio, y su
+base incluye valores imposibles (edades de 120 años o IMC de 0) y resultados
+contradictorios entre pruebas $t$ y ANOVA. Sin una definición clara de la
+etiqueta, existe el riesgo de que los modelos reproduzcan un criterio circular.
+
+\subsection{Qué falta investigar}
+El seguimiento prenatal reduce la mortalidad, pero los estudios solo miden la
+asistencia a los controles y no dicen qué mediciones de esos controles sirven
+para identificar a una gestante en riesgo (Wondemagegn et al., 2018). Los trabajos
+predictivos, por su parte, se quedan en muestras pequeñas o en análisis
+bivariados que no consideran el orden natural de los niveles de riesgo. Falta
+determinar si un conjunto pequeño de signos vitales, que se pueden medir en un
+puesto de salud rural, alcanza para clasificar el nivel de riesgo, cuál de ellos
+pesa más y con cuánta incertidumbre. Este trabajo aborda ese vacío con una
+regresión logística ordinal bayesiana, que respeta el orden de las clases, permite
+interpretar el peso de cada variable a partir de sus coeficientes y cuantifica la
+incertidumbre de cada estimación.
