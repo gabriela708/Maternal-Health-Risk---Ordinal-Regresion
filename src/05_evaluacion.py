@@ -2,8 +2,10 @@
 
 Responsable: Juan Esteban Silva.
 Entrada:  data/processed/test.csv, test_full.csv y cadenas del MCMC (cadenas_*.npy)
-Salidas:  results/tables/eval_metricas.csv, eval_umbrales.csv, eval_peso_predictivo.csv
-          results/figures/eval_confusion_train.png, eval_confusion_train_full.png
+Salidas:  results/tables/eval_metricas.csv, eval_umbrales.csv, eval_peso_predictivo.csv,
+          eval_sensibilidad_costo.csv
+          results/figures/eval_confusion_test.png, eval_confusion_test_full.png
+          (las figuras se nombran por el conjunto de prueba donde se evaluaron)
 
 Requiere haber corrido antes: python src/03_modelo_bayesiano.py
 Uso: python src/05_evaluacion.py   (en Colab: %run src/05_evaluacion.py)
@@ -128,7 +130,7 @@ def evaluar(nombre_modelo, archivo_test, etiqueta):
     ax.set_ylabel("Real")
     ax.set_title(f"Matriz de confusión (regla de costo)\n{etiqueta}")
     fig.tight_layout()
-    fig.savefig(FIGURES / f"eval_confusion_{nombre_modelo}.png", dpi=150, bbox_inches="tight")
+    fig.savefig(FIGURES / f"eval_confusion_{Path(archivo_test).stem}.png", dpi=150, bbox_inches="tight")
     plt.show()
     return pd.DataFrame(filas)
 
@@ -152,6 +154,32 @@ def evaluar_umbrales(nombre_modelo, archivo_test, etiqueta):
 
 #   Es un análisis de sensibilidad: la regla se elige por el orden de gravedad,
 #   no por el umbral que mejor resulte en test (eso sería fuga de información).
+
+
+#%% SENSIBILIDAD: COSTO DE CLASIFICAR BAJO COMO MEDIO (con train)
+COSTOS_BAJO_MEDIO = [1.0, 1.2, 1.5, 2.0]
+
+
+def sensibilidad_costo(nombre_modelo, archivo_train, etiqueta):
+    """Recalls y métricas en train al variar el costo bajo->medio de la matriz.
+
+    Solo cambia la casilla COSTOS[0, 1]; el resto de la matriz se mantiene.
+    Se calcula con train porque es un análisis de sensibilidad de la regla,
+    no una forma de escogerla mirando el test.
+    """
+    muestras = cargar_muestras(nombre_modelo)
+    X_train, y_train = cargar_test(archivo_train)
+    probs = probabilidades_predictivas(muestras, X_train)
+
+    filas = []
+    for costo in COSTOS_BAJO_MEDIO:
+        costos = COSTOS.astype(float).copy()
+        costos[0, 1] = costo
+        m = calcular_metricas(y_train, clasificar_costo(probs, costos))
+        filas.append({"escenario": etiqueta, "regla": f"costo bajo->medio {costo:g}", **m})
+    filas.append({"escenario": etiqueta, "regla": "MAP",
+                  **calcular_metricas(y_train, np.argmax(probs, axis=1))})
+    return pd.DataFrame(filas)
 
 
 #%% PESO PREDICTIVO DE CADA VARIABLE
@@ -184,6 +212,11 @@ if __name__ == "__main__":
     umbrales.to_csv(TABLES / "eval_umbrales.csv", index=False)
     print("\n--- Sensibilidad a la regla de clasificación ---")
     print(umbrales.round(3).to_string(index=False))
+
+    sensibilidad = sensibilidad_costo("train", "train.csv", "Sin duplicados")
+    sensibilidad.to_csv(TABLES / "eval_sensibilidad_costo.csv", index=False)
+    print("\n--- Sensibilidad al costo bajo->medio (train, sin duplicados) ---")
+    print(sensibilidad.round(3).to_string(index=False))
 
     pesos = pd.concat([peso_predictivo(m, et) for m, _, et in escenarios], ignore_index=True)
     pesos.to_csv(TABLES / "eval_peso_predictivo.csv", index=False)

@@ -137,10 +137,41 @@ exactitud global son algo menores que con la regla MAP (Figura~\ref{fig:confusio
 Por coherencia con el objetivo del proyecto, que prioriza detectar a las
 gestantes de alto riesgo, se toma la regla de costo esperado como regla principal.
 
+Para evaluar qué tanto depende la clasificación de la matriz de costos, se
+varió el costo de clasificar como riesgo medio a una gestante de riesgo bajo,
+manteniendo el resto de la matriz (Tabla~\ref{tab:sensibilidad_costo}). Al
+aumentar ese costo se reducen las falsas alarmas en la clase baja, pero el
+recall de la clase media cae rápidamente: con un costo de 2 el modelo deja de
+predecir esa clase por completo. En cambio, el recall de alto riesgo se
+mantiene alto en todos los casos (entre $0.76$ y $0.93$). Esto muestra que la
+matriz no cambia la capacidad del modelo, sino hacia qué lado se cometen los
+errores entre las clases baja y media, que el modelo separa con dificultad. Se
+conservó el costo de 1, ya que en un contexto de atención primaria es
+preferible revisar de más a una gestante de riesgo bajo que dejar sin
+seguimiento a una de riesgo medio.
+
+\begin{table}[h]
+\centering
+\caption{Sensibilidad de la regla de costo al costo de clasificar como medio a una gestante de riesgo bajo (base de entrenamiento sin duplicados).}
+\label{tab:sensibilidad_costo}
+\small
+\begin{tabular}{lccccc}
+\toprule
+Costo bajo$\to$medio & Recall bajo & Recall medio & Recall alto & MCC & Exact. bal.\\
+\midrule
+1 (elegido) & 0.45 & 0.52 & 0.76 & 0.36 & 0.58\\
+1.2         & 0.52 & 0.42 & 0.85 & 0.38 & 0.60\\
+1.5         & 0.61 & 0.30 & 0.85 & 0.38 & 0.58\\
+2           & 0.76 & 0.00 & 0.93 & 0.43 & 0.56\\
+MAP         & 0.94 & 0.09 & 0.60 & 0.41 & 0.54\\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.49\columnwidth]{eval_confusion_train.png}
-\includegraphics[width=0.49\columnwidth]{eval_confusion_train_full.png}
+\includegraphics[width=0.49\columnwidth]{eval_confusion_test.png}
+\includegraphics[width=0.49\columnwidth]{eval_confusion_test_full.png}
 \caption{Matrices de confusión con la regla de costo esperado: sin duplicados (izq.) y con duplicados (der.).}
 \label{fig:confusion}
 \end{figure}
