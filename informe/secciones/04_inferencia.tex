@@ -81,7 +81,9 @@ Aquí $\mathcal{N}^{+}$ denota una distribución Normal restringida a valores po
 $s_j$ es la desviación estándar calculada sobre el conjunto de entrenamiento durante el preprocesamiento.
 Para las variables de edad y presión arterial, las desviaciones estándar originales de las
 priors son $0.02$ (no a sus varianzas); al expresarse unidades estandarizadas se multiplican
-por $s_j$. Por otro lado,la prior de glucemia se especifica débilmente informativa como
+por $s_j$. La prior positiva de la edad refleja el aumento del riesgo con la edad materna
+avanzada; no captura el riesgo asociado a edades menores de 20 años, ya que el
+modelo trata la edad de forma lineal. Por otro lado,la prior de glucemia se especifica débilmente informativa como
 $\mathcal{N}^{+}(0,1^2)$ estandarizada (desviación estándar $1$), esta elección refleja el
 signo no negativo esperado, omitiendo el OR $1.35$ por mmol/L de la versión anterior, ya que no se ha
 verificado como efecto de `BS` continua. La prior de frecuencia cardíaca es
@@ -105,6 +107,7 @@ $\alpha_1<\alpha_2$:
 \phi(\alpha_2;m_2,0.5^2)\,
 \mathbb{I}(\alpha_1<\alpha_2).
 \]
+
 Esta elección corresponde a un enfoque de Bayes empírico, dado que estima hiperparámetros con las
 etiquetas del grupo de entrenamiento, que también intervienen en la likelihood, además no usa
 etiquetas de prueba; esta reutilización y su efecto deben reconocerse y
