@@ -1,3 +1,67 @@
 % Responsables: A, B y C
 \section{Conclusiones}
-% TODO
+
+El modelo se estimó con 451 registros únicos y solo seis signos fisiológicos, y
+con ellos detectó el 86\,\% de las gestantes de alto riesgo en la base de prueba.
+Esto indica que una muestra moderada y un conjunto mínimo de variables medibles
+en un puesto rural bastan para sostener una alerta de alto riesgo, aunque no para
+graduar los tres niveles. Esto teniendo en cuenta que se tomó la decisión de
+eliminar duplicados debido a que al mantenerlos el único efecto era
+sobreestimación en las posteriors.
+
+Las estimaciones son confiables desde el punto de vista computacional. Las cuatro
+cadenas de Metropolis-Hastings convergieron, con $\hat{R}\leq1.01$ y un ESS mínimo
+de 1.003 (glucosa), y las posteriores resultaron mucho más angostas que las
+priors. Esto indica que los resultados están determinados por los datos.
+
+En cuanto a las variables, la glucemia fue la de mayor peso ($\mathrm{OR}=3.5$ por
+desviación estándar), lo que confirma la hipótesis derivada del análisis
+exploratorio, donde ya presentaba la mayor correlación con el riesgo ($r=0.57$).
+La presión sistólica ($\mathrm{OR}=1.8$) también confirmó el efecto positivo
+esperado a partir de la literatura sobre trastornos hipertensivos. La temperatura
+($\mathrm{OR}=2.3$), en cambio, contradijo lo previsto: su prior se centró en cero
+por su baja variabilidad, pero ocupó el segundo lugar. Dado que casi todos los
+registros se concentran en 98\,°F, este efecto refleja principalmente la presencia
+o ausencia de fiebre, se presume que va relacionado con variables que no están
+explícitas en el dataset y por lo mismo su explicación puede deberse a relación
+con ellas. Además, como se mencionó anteriormente, el modelo es mejor separando
+la clase alta y coincide con que los registros con fiebre tienen como etiqueta
+riesgo alto.
+
+La regla de decisión determinó buena parte del desempeño. Con la regla MAP, la
+clase media casi no se predijo (recall de $0.04$) porque su probabilidad nunca
+superó $0.39$, y ajustar un umbral para el alto riesgo tampoco la recuperó: el
+recall medio no pasó de $0.08$. La regla de costo esperado elevó el recall de alto
+riesgo de $0.68$ a $0.86$, recuperó la clase media hasta $0.40$ y obtuvo la mayor
+exactitud balanceada ($0.60$), a cambio de un MCC algo menor ($0.38$ frente a
+$0.43$). Esa pérdida proviene del aumento de falsas alarmas, que es el error
+definido como menos grave. Se prefirió así un modelo que remite de más a uno que
+omite casos graves.
+
+Esta preferencia se justifica por el costo operativo de cada error. Clasificar
+como bajo riesgo a una gestante de alto riesgo, el error con mayor peso en la
+matriz, implica que no se la remite ni se refuerza su seguimiento, con una
+consecuencia potencialmente irreversible. Clasificar como medio a una gestante de
+bajo riesgo genera controles adicionales y gastos de transporte, un costo
+relevante en un entorno de recursos limitados pero recuperable. Con todo, los
+pesos de la matriz son una decisión del grupo y requieren validación clínica.
+
+El bajo desempeño en la clase media sugiere que el supuesto de odds
+proporcionales no se cumple del todo: un mismo efecto por variable en ambos
+puntos de corte favorece la transición hacia el alto riesgo y deja sin definición
+la clase intermedia. Sin embargo, hace parte del trabajo futuro realizar
+comparaciones profundas y con otra perspectiva académica.
+
+Además, como la fuente no documenta cómo se asignó RiskLevel, el modelo reproduce
+esa etiqueta y no necesariamente un criterio clínico. Si la etiqueta se construyó
+con estos mismos signos, parte del desempeño reflejaría la regla de etiquetado.
+
+Por último, la validación externa exige prudencia. Los puntos de corte dependen
+de la proporción de clases de esta base, los sensores redondean las mediciones y
+la base de prueba es pequeña (117 registros). Aplicar el modelo en otra población
+requeriría recalibrarlo y validarlo con datos locales.
+
+El modelo sirve, por tanto, como alerta de alto riesgo que apoya la decisión del
+profesional, pero no para graduar el riesgo intermedio. Su mejora depende de una
+etiqueta documentada, de modelos que relajen el supuesto de odds proporcionales y
+de validación en la población de destino.
